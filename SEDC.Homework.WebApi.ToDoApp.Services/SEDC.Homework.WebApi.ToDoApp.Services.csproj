@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SEDC.Homework.WebApi.ToDoApp.DataAccess\SEDC.Homework.WebApi.ToDoApp.DataAccess.csproj" />
+    <ProjectReference Include="..\SEDC.Homework.WebApi.ToDoApp.DataModels\SEDC.Homework.WebApi.ToDoApp.DataModels.csproj" />
+    <ProjectReference Include="..\SEDC.Homework.WebApi.ToDoApp.Models\SEDC.Homework.WebApi.ToDoApp.Models.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace SEDC.Homework.WebApi.ToDoApp.DataModels
@@ -21,7 +22,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.DataModels
             //USER
             modelBuilder
                 .Entity<User>()
-                .ToTable(nameof(User))
+                .ToTable("Users")
                 .HasKey(p => p.Id);
 
             modelBuilder
@@ -36,10 +37,10 @@ namespace SEDC.Homework.WebApi.ToDoApp.DataModels
                 .HasMaxLength(100)
                 .IsRequired();
 
-            //TODO
+            
             modelBuilder
                 .Entity<ToDo>()
-                .ToTable(nameof(ToDo))
+                .ToTable("ToDos")
                 .HasKey(p => p.Id);
 
             modelBuilder
@@ -61,7 +62,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.DataModels
 
             modelBuilder
                 .Entity<SubTask>()
-                .ToTable(nameof(SubTask))
+                .ToTable("SubTasks")
                 .HasKey(p => p.Id);
 
             modelBuilder
@@ -86,13 +87,17 @@ namespace SEDC.Homework.WebApi.ToDoApp.DataModels
 
         public void Seed(ModelBuilder modelBuilder)
         {
+            var md5 = new MD5CryptoServiceProvider();
+            var md5data = md5.ComputeHash(Encoding.ASCII.GetBytes("bob123"));
+            var hashedPassword = Encoding.ASCII.GetString(md5data);
+
             modelBuilder.Entity<User>()
                 .HasData(
                 new User()
                 {
                     Id = 1,
                     UserName = "bob007",
-                    Password = "bob123",
+                    Password = hashedPassword,
                     FirstName = "Bob",
                     LastName = "Bobsky"
                 });
@@ -121,42 +126,42 @@ namespace SEDC.Homework.WebApi.ToDoApp.DataModels
                 {
                     Id = 1,
                     Text = "Research and consult with client",
-                    Status = Enums.Status.Finished,
+                    Status = 3,
                     ToDoId = 1
                 },
                 new SubTask()
                 {
                     Id = 2,
                     Text = "Create the application",
-                    Status = Enums.Status.InProgress,
+                    Status = 2,
                     ToDoId = 1
                 },
                 new SubTask()
                 {
                     Id = 3,
                     Text = "Add swagger",
-                    Status = Enums.Status.NotStarted,
+                    Status = 1,
                     ToDoId = 1
                 },
                 new SubTask()
                 {
                     Id = 4,
                     Text = "Consult with client about changes",
-                    Status = Enums.Status.Finished,
+                    Status = 3,
                     ToDoId = 2
                 },
                 new SubTask()
                 {
                     Id = 5,
                     Text = "Make a team meeting",
-                    Status = Enums.Status.InProgress,
+                    Status = 2,
                     ToDoId = 2
                 },
                 new SubTask()
                 {
                     Id = 6,
                     Text = "Code the app",
-                    Status = Enums.Status.NotStarted,
+                    Status = 1,
                     ToDoId = 2
                 }
                 );

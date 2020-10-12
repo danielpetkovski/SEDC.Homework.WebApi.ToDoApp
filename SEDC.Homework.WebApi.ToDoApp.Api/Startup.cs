@@ -9,7 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SEDC.Homework.WebApi.ToDoApp.Services;
 using SEDC.Homework.WebApi.ToDoApp.Services.Helpers;
+using SEDC.Homework.WebApi.ToDoApp.Services.Interfaces;
 
 namespace SEDC.Homework.WebApi.ToDoApp.Api
 {
@@ -25,12 +27,18 @@ namespace SEDC.Homework.WebApi.ToDoApp.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            // getting connection string
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
+            // registering data access dependencies
             DiModule.RegisterModule(services, connectionString);
 
 
+            //service registration
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IToDoService, ToDoService>();
+            services.AddTransient<ISubTaskService, SubTaskService>();
+           
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 

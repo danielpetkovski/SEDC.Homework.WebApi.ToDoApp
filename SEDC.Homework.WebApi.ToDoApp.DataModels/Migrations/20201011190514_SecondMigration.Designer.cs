@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SEDC.Homework.WebApi.ToDoApp.DataModels;
 
 namespace SEDC.Homework.WebApi.ToDoApp.DataModels.Migrations
 {
     [DbContext(typeof(ToDosDbContext))]
-    partial class ToDosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201011190514_SecondMigration")]
+    partial class SecondMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,12 +40,12 @@ namespace SEDC.Homework.WebApi.ToDoApp.DataModels.Migrations
                     b.ToTable("SubTasks");
 
                     b.HasData(
-                        new { Id = 1, Status = 3, Text = "Research and consult with client", ToDoId = 1 },
-                        new { Id = 2, Status = 2, Text = "Create the application", ToDoId = 1 },
-                        new { Id = 3, Status = 1, Text = "Add swagger", ToDoId = 1 },
-                        new { Id = 4, Status = 3, Text = "Consult with client about changes", ToDoId = 2 },
-                        new { Id = 5, Status = 2, Text = "Make a team meeting", ToDoId = 2 },
-                        new { Id = 6, Status = 1, Text = "Code the app", ToDoId = 2 }
+                        new { Id = 1, Status = 2, Text = "Research and consult with client", ToDoId = 1 },
+                        new { Id = 2, Status = 1, Text = "Create the application", ToDoId = 1 },
+                        new { Id = 3, Status = 0, Text = "Add swagger", ToDoId = 1 },
+                        new { Id = 4, Status = 2, Text = "Consult with client about changes", ToDoId = 2 },
+                        new { Id = 5, Status = 1, Text = "Make a team meeting", ToDoId = 2 },
+                        new { Id = 6, Status = 0, Text = "Code the app", ToDoId = 2 }
                     );
                 });
 

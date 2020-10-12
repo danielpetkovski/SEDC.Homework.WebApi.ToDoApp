@@ -7,9 +7,9 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services.Interfaces
 {
    public interface ISubTaskService
     {
-        IEnumerable<SubTaskDto> GetUserSubTasks(int todoId);
-        SubTaskDto GetSubTask(int SubTaskId, int todoId);
+        IEnumerable<SubTaskDto> GetUserSubTasks(int userId);
+        SubTaskDto GetSubTask(int userId, int todoId, int subTaskId);
         void AddSubTask(SubTaskDto request);
-        void DeleteSubTask(int SubTaskId, int todoId);
+        void DeleteSubTask(int userId, int todoId, int subTaskId);
     }
 }

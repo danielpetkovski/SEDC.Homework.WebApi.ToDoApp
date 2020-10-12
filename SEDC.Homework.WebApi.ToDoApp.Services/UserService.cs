@@ -91,7 +91,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 UserName = request.Username,
-                Password = request.Password
+                Password = hashedPassword
             };
 
             _userRepository.Insert(user);

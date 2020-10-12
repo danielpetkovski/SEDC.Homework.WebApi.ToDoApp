@@ -28,7 +28,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
         public void AddToDo(ToDoDto request)
         {
             var user = _userRepository.GetAll()
-                .FirstOrDefault(x => x.Id == request.Id);
+                .FirstOrDefault(x => x.Id == request.UserId);
 
             if (user == null)
             {
@@ -93,6 +93,12 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
 
         public IEnumerable<ToDoDto> GetUserToDos(int userId)
         {
+            var user = _userRepository.GetAll().FirstOrDefault(x => x.Id == userId);
+            if (user == null)
+            {
+                throw new ToDoException("User does not exist");
+            }
+
             return _todoRepository
                 .GetAll()
                 .Where(x => x.UserId == userId)

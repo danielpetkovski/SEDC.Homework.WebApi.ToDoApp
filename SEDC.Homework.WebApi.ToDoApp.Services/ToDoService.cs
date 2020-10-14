@@ -15,15 +15,15 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
     {
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<ToDo> _todoRepository;
-       // private readonly IRepository<SubTask> _subtaskRepository;
+        private readonly IRepository<SubTask> _subtaskRepository;
 
         public ToDoService(IRepository<User> userRepository,
-            IRepository<ToDo> todoRepository)
-           // IRepository<SubTask> subtaskRepository)
+            IRepository<ToDo> todoRepository,
+            IRepository<SubTask> subtaskRepository)
         {
             _userRepository = userRepository;
             _todoRepository = todoRepository;
-           // _subtaskRepository = subtaskRepository;
+            _subtaskRepository = subtaskRepository;
         }
         public void AddToDo(ToDoDto request)
         {
@@ -49,7 +49,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
             {
                 Text = request.Text,
                 Color = request.Color,
-                UserId = request.UserId,
+                UserId = request.UserId
             };
 
             _todoRepository.Insert(todo);
@@ -70,7 +70,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
             _todoRepository.Remove(todo);
         }
 
-        public ToDoDto GetToDo(int toDoId, int userId)
+        public ToDoDts GetToDo(int toDoId, int userId)
         {
             var todo = _todoRepository
                 .GetAll()
@@ -81,17 +81,30 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
                 throw new ToDoException("ToDo with that id does not exist");
             }
 
-            return new ToDoDto
+            var toDoClient =  new ToDoDts
             {
                 Id = todo.Id,
                 Color = todo.Color,
                 Text = todo.Text,
-                UserId = todo.UserId
+                UserId = todo.UserId,
+                SubTasks = _subtaskRepository
+                    .GetAll()
+                    .Where(y => y.ToDoId == todo.Id)
+                    .Select(z => new SubTaskDto
+
+                    {
+                        Id = z.Id,
+                        Text = z.Text,
+                        Status = (Status)z.Status,
+                        ToDoId = z.ToDoId
+                    })
             };
+
+            return toDoClient;
 
         }
 
-        public IEnumerable<ToDoDto> GetUserToDos(int userId)
+        public IEnumerable<ToDoDts> GetUserToDos(int userId)
         {
             var user = _userRepository.GetAll().FirstOrDefault(x => x.Id == userId);
             if (user == null)
@@ -99,16 +112,30 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
                 throw new ToDoException("User does not exist");
             }
 
-            return _todoRepository
+            var toDos = _todoRepository
                 .GetAll()
-                .Where(x => x.UserId == userId)
-                .Select(x => new ToDoDto
-                {
-                    Color = x.Color,
-                    Id = x.Id,
-                    Text = x.Text,
-                    UserId = x.UserId
-                });
+                .Where(x => x.UserId == userId);
+
+           var toDosDts = toDos
+            .Select(x => new ToDoDts
+            {
+                Color = x.Color,
+                Id = x.Id,
+                Text = x.Text,
+                UserId = x.UserId,
+                SubTasks = _subtaskRepository
+                    .GetAll()
+                    .Where(y => y.ToDoId == x.Id)
+                    .Select(z => new SubTaskDto
+                        {
+                            Id = z.Id,
+                            Text = z.Text,
+                            Status = (Status)z.Status,
+                            ToDoId = z.ToDoId
+                        })
+            });
+
+            return toDosDts;
         }
     }
 }

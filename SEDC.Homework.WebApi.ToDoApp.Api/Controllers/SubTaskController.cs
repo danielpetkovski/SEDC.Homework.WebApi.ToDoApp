@@ -20,7 +20,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.Api.Controllers
         {
             this._subTaskService = subTaskService;
         }
-
+        
         [HttpGet]
         public ActionResult<IEnumerable<SubTaskDto>> Get([FromQuery]int userId)
         {
@@ -35,12 +35,13 @@ namespace SEDC.Homework.WebApi.ToDoApp.Api.Controllers
             }
         }
 
+        //TODO: Returns subtask with id 7 even if it doesnt belong to todo(only if todo exists)
         [HttpGet("{id}")]
         public ActionResult<SubTaskDto> Get(int id, [FromQuery]int todoId, [FromQuery]int userId)
         {
             try
             {
-                return Ok(_subTaskService.GetSubTask(userId, todoId, id));
+                return Ok(_subTaskService.GetSubTask(id, todoId, userId));
                 
             }
             catch (Exception ex)
@@ -55,7 +56,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.Api.Controllers
         {
             try
             {
-                _subTaskService.DeleteSubTask(userId, todoId, id);
+                _subTaskService.DeleteSubTask(id, todoId, userId);
                 Debug.WriteLine($"Successfully deleted Subtask {id}");
                 return Ok("Successfully deleted Subtask");
             }

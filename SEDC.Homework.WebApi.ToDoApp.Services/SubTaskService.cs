@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-//TODO: REFACTOR SUBTASK SERVICE
+
 
 namespace SEDC.Homework.WebApi.ToDoApp.Services
 {
@@ -16,15 +16,15 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
     {
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<ToDo> _todoRepository;
-        private readonly IRepository<SubTask> _subTaskRepository;
+        private readonly IRepository<SubTask> _subtaskRepository;
 
         public SubTaskService(IRepository<User> userRepository,
             IRepository<ToDo> todoRepository,
-            IRepository<SubTask> subTaskRepository)
+            IRepository<SubTask> subtaskRepository)
         {
             _userRepository = userRepository;
             _todoRepository = todoRepository;
-            _subTaskRepository = subTaskRepository;
+            _subtaskRepository = subtaskRepository;
         }
 
         public void AddSubTask(SubTaskDto request)
@@ -37,7 +37,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
                 throw new SubTaskException("User does not exist");
             }
 
-            var todo = user.ToDos
+            var todo = _todoRepository.GetAll()
                 .FirstOrDefault(x => x.Id == request.ToDoId);
 
             if (todo == null)
@@ -62,7 +62,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
                 ToDoId = request.ToDoId
             };
 
-            _subTaskRepository.Insert(subTask);
+            _subtaskRepository.Insert(subTask);
 
         }
 
@@ -76,24 +76,24 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
                 throw new SubTaskException("User with that id does not exist");
             }
 
-            var todo = user.ToDos.FirstOrDefault(x => x.Id == todoId);
+            var todo = _todoRepository.GetAll().FirstOrDefault(x => x.Id == todoId);
 
             if (todo == null)
             {
                 throw new SubTaskException("ToDo with that id does not exist");
             }
 
-            var subTask = todo.SubTasks.FirstOrDefault(x => x.Id == subTaskId);
+            var subTask = _subtaskRepository.GetAll().FirstOrDefault(x => x.Id == subTaskId);
 
             if (subTask == null)
             {
                 throw new SubTaskException("SubTask with that id does not exist");
             }
 
-            _subTaskRepository.Remove(subTask);
+            _subtaskRepository.Remove(subTask);
 
         }
-
+        //TODO: Combine user todo and subtaskid to check together
         public SubTaskDto GetSubTask(int subTaskId, int todoId, int userId)
         {
             var user = _userRepository.GetAll()
@@ -104,14 +104,14 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
                 throw new SubTaskException("User with that id does not exist");
             }
 
-            var todo = user.ToDos.FirstOrDefault(x => x.Id == todoId);
+            var todo = _todoRepository.GetAll().FirstOrDefault(x => x.Id == todoId);
 
             if (todo == null)
             {
                 throw new SubTaskException("ToDo with that id does not exist");
             }
 
-            var subTask = todo.SubTasks.FirstOrDefault(x => x.Id == subTaskId);
+            var subTask = _subtaskRepository.GetAll().FirstOrDefault(x => x.Id == subTaskId);
 
             if (subTask == null)
             {
@@ -120,6 +120,7 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
 
             return new SubTaskDto
             {
+                //TODO: u dont need Ids returned, Status 
                 Id = subTask.Id,
                 Status = (Status)subTask.Status,
                 Text = subTask.Text,
@@ -138,17 +139,41 @@ namespace SEDC.Homework.WebApi.ToDoApp.Services
                 throw new SubTaskException("User with that id does not exist");
             }
 
-            return _todoRepository
+            var toDo = _todoRepository
                 .GetAll()
-                .Where(x => x.UserId == userId)
-                .SelectMany(x => x.SubTasks)
-                .Select(x => new SubTaskDto
-                {
-                    Id = x.Id,
-                    Status = (Status)x.Status,
-                    Text = x.Text,
-                    ToDoId = x.ToDoId
-                });
+                .Where(x => x.UserId == userId);
+
+            if (toDo == null)
+            {
+                throw new SubTaskException("That user does not have any ToDos");
+            }
+
+            var toDos = toDo.Select(x => new ToDoDts
+            {
+                Color = x.Color,
+                Id = x.Id,
+                Text = x.Text,
+                UserId = x.UserId,
+                SubTasks = _subtaskRepository
+                    .GetAll()
+                    .Where(y => y.ToDoId == x.Id)
+                    .Select(z => new SubTaskDto
+                    {
+                        Id = z.Id,
+                        Text = z.Text,
+                        Status = (Status)z.Status,
+                        ToDoId = z.ToDoId
+                    })
+            });
+
+            var subTasks = toDos.SelectMany(x => x.SubTasks);
+
+            if (!subTasks.Any())
+            {
+                throw new SubTaskException("That user does not have any SubTasks");
+            }
+
+            return subTasks;
         }
     }
 }
